@@ -1,0 +1,25 @@
+@SalvationDictionaryApi_HostAddress = http://localhost:5063
+
+###
+# Get all items
+###
+GET {{SalvationDictionaryApi_HostAddress}}/api/SalvationDictionary
+Accept: application/json
+
+###
+# Get item per ID which exists
+###
+GET {{SalvationDictionaryApi_HostAddress}}/api/SalvationDictionary/1
+Accept: application/json
+
+###
+# Get item per ID which does not exist
+###
+GET {{SalvationDictionaryApi_HostAddress}}/api/SalvationDictionary/-1
+Accept: application/json
+
+###
+# Get a random entry
+###
+GET {{SalvationDictionaryApi_HostAddress}}/api/SalvationDictionary/Random
+Accept: application/json
