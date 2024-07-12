@@ -24,7 +24,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-var random = new Random();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,15 +49,18 @@ app.MapGet("/api/SalvationDictionary", (SalvationDictionaryDbContext salvationDi
 
 app.MapGet("/api/SalvationDictionary/Random", (SalvationDictionaryDbContext salvationDictionaryDbContext) =>
 {
-    var numberOfEntries = salvationDictionaryDbContext.DictionaryEntries.Count();
-    var randomSkipCount = random.Next(0, numberOfEntries);
     var randomlySelectedDictionaryEntry = salvationDictionaryDbContext
         .DictionaryEntries
-        .Skip(randomSkipCount)
+        .OrderBy(_ => EF.Functions.Random())
         .Take(1)
         .Include(de => de.Title)
         .Include(de => de.Subtitle)
         .FirstOrDefault();
+
+    if (randomlySelectedDictionaryEntry is null)
+    {
+        return Results.NotFound();
+    }
     
     return Results.Ok(randomlySelectedDictionaryEntry);
 })
@@ -73,9 +75,10 @@ app.MapGet("/api/SalvationDictionary/{id}", ([FromRoute]int id, SalvationDiction
         .Where(de => de.Id == id)
         .Include(de => de.Title)
         .Include(de => de.Subtitle)
-        .OrderBy(de => de.Id);
+        .OrderBy(de => de.Id)
+        .FirstOrDefault();
 
-    if (!matchingItem.Any())
+    if (matchingItem is null)
     {
         return Results.NotFound();
     }
